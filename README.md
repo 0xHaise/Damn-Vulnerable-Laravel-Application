@@ -1,59 +1,285 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><a   target="_blank"><img src="readme.jpg" width="400" alt="lab logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Damn Vulnerable Laravel Application (DVLA)
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**DVLA** is an intentionally vulnerable Laravel web application designed as an educational platform for learning about common web security vulnerabilities and their mitigation strategies. This laboratory provides hands-on experience with real-world security issues and their fixes.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Purpose
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+This application serves as a teaching tool to demonstrate:
+- Common web application vulnerabilities
+- How attackers exploit these vulnerabilities
+- Industry-standard security practices to prevent exploitation
+- Different implementations of the same security solution
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Path Traversal Vulnerability Lab
+Demonstrates file download vulnerabilities and multiple mitigation strategies.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### Vulnerable Endpoint: `/download`
+- **Issue**: No input validation or sanitization
+- **Risk**: Attackers can access arbitrary files on the server
+- **Example Attack**: 
+  ```
+  /download?filename=../../.env
+  /download?filename=../../composer.json
+  ```
 
-## Laravel Sponsors
+#### Secure Implementations
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+##### 1. **basename()** Approach (`/download-secure`)
+- Strips directory path components
+- Simple and lightweight
+- Works well for basic scenarios
 
-### Premium Partners
+##### 2. **realpath()** Approach (`/download-realpath`)
+- Validates the real path of the file
+- Ensures the file stays within the allowed directory
+- More robust against edge cases
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+##### 3. **Allow-list** Approach (`/download-allowlist`)
+- Only permits a predefined list of files
+- Most restrictive and secure
+- Best practice for controlled file access
+
+### 2. Open Redirect Vulnerability Lab
+Demonstrates unsafe redirects and proper validation methods.
+
+#### Vulnerable Endpoint: `/redirect-vuln`
+- **Issue**: Redirects to any URL without validation
+- **Risk**: Attackers can perform phishing attacks, credential theft
+- **Example Attack**: 
+  ```
+  /redirect-vuln?url=http://evil.example.com/fake-login
+  /redirect-vuln?url=http://phishing-site.com
+  ```
+
+#### Secure Implementations
+
+##### 1. **Allow-list Hosts** Approach (`/redirect-safe`)
+- Validates the URL structure
+- Only allows specific trusted hosts
+- Checks both scheme and hostname
+- Recommended for external redirects
+
+##### 2. **Relative Paths Only** Approach (`/redirect-validate`)
+- Only allows relative paths (starting with `/`)
+- Prevents external redirects
+- Best for internal application navigation
+
+## Technology Stack
+
+- **Framework**: Laravel 12.0
+- **PHP**: 8.2+
+- **Database**: SQLite (for development)
+- **Frontend**: Tailwind CSS 4.0
+- **Build Tool**: Vite 7.0
+- **Testing**: PHPUnit 11.5
+
+## Project Structure
+
+```
+├── app/                    # Application code
+│   ├── Http/Controllers/   # HTTP controllers
+│   ├── Models/             # Eloquent models
+│   └── Providers/          # Service providers
+├── routes/                 # Application routes
+│   └── web.php             # Web routes (vulnerable endpoints)
+├── resources/
+│   ├── views/
+│   │   ├── lab.blade.php   # Lab interface
+│   │   └── welcome.blade.php
+│   ├── css/                # Tailwind CSS
+│   └── js/                 # Frontend JavaScript
+├── storage/
+│   └── content/            # Sample files for download lab
+├── database/               # Migrations and seeders
+├── tests/                  # Test suites
+└── public/                 # Public assets
+```
+
+## Getting Started
+
+### Prerequisites
+- PHP 8.2 or higher
+- Composer
+- Node.js and npm
+- Git
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd DVLA
+   ```
+
+2. **Run the setup script**
+   ```bash
+   composer run setup
+   ```
+   
+   This will:
+   - Install PHP dependencies
+   - Create `.env` file
+   - Generate application key
+   - Run database migrations
+   - Install npm dependencies
+   - Build assets
+
+3. **Start the development server**
+   ```bash
+   composer run dev
+   ```
+
+   This starts:
+   - Laravel development server (http://localhost:8000)
+   - Queue listener
+   - Vite asset watcher
+   - Log streaming
+
+## Usage
+
+### Accessing the Lab
+
+1. Open your browser and navigate to `http://localhost:8000`
+2. Click on the **Lab** link to access the security laboratory
+3. Interact with the vulnerable and secure endpoints
+
+### Testing Path Traversal
+
+1. Go to the **"Descargas - Path traversal"** section
+2. Try these examples:
+   - **Vulnerable endpoint**: `../../.env` (should succeed - unsafe!)
+   - **Secure endpoints**: Try the same payload (should be blocked)
+
+### Testing Open Redirect
+
+1. Go to the **"Open Redirect"** section
+2. Try these examples:
+   - **Vulnerable endpoint**: `http://evil.example.com`
+   - **Secure endpoints**: `http://example.com` or relative paths like `/download`
+
+## Security Lessons
+
+### Lesson 1: Input Validation
+- **Never trust user input**
+- Always validate and sanitize input before using it
+- Use whitelisting (allow-list) instead of blacklisting when possible
+
+### Lesson 2: Path Traversal Prevention
+- Use `basename()` for simple filename extraction
+- Use `realpath()` to validate file paths
+- Implement allow-lists for sensitive file access
+
+### Lesson 3: Redirect Validation
+- Never redirect to unvalidated URLs
+- Use URL parsing to validate structure
+- Maintain a whitelist of allowed hosts
+- Consider restricting to relative paths only
+
+### Lesson 4: Defense in Depth
+- Multiple layers of security are better than one
+- Combine different validation techniques
+- Follow the principle of least privilege
+
+## Running Tests
+
+Run the test suite:
+
+```bash
+composer test
+```
+
+This will clear the configuration cache and run PHPUnit tests.
+
+## Available Endpoints
+
+### File Download Endpoints
+
+| Endpoint | Status | Description |
+|----------|--------|-------------|
+| `/download` | ⚠️ Vulnerable | No validation |
+| `/download-secure` | ✅ Secure | Uses `basename()` |
+| `/download-realpath` | ✅ Secure | Uses `realpath()` validation |
+| `/download-allowlist` | ✅ Secure | Uses file allow-list |
+
+### Redirect Endpoints
+
+| Endpoint | Status | Description |
+|----------|--------|-------------|
+| `/redirect-vuln` | ⚠️ Vulnerable | No validation |
+| `/redirect-safe` | ✅ Secure | Allow-list of hosts |
+| `/redirect-validate` | ✅ Secure | Relative paths only |
+
+## Files in Storage
+
+Sample files available for download in `storage/content/`:
+- `hello.txt` - Simple text file
+
+**Note**: Additional files can be added for testing purposes.
+
+## Development Commands
+
+```bash
+# Development server with hot reload
+composer run dev
+
+# Build for production
+npm run build
+
+# Run tests
+composer test
+
+# Format code with Pint
+vendor/bin/pint
+
+# Lint YAML files
+vendor/bin/yaml-lint
+
+# Access Laravel Tinker (interactive shell)
+php artisan tinker
+```
+
+## Security Best Practices References
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')](https://cwe.mitre.org/data/definitions/22.html)
+- [CWE-601: URL Redirection to Untrusted Site ('Open Redirect')](https://cwe.mitre.org/data/definitions/601.html)
+- [Laravel Security Documentation](https://laravel.com/docs/security)
+
+## Important Notes
+
+⚠️ **Warning**: This application is intentionally vulnerable. Do not use this in production or expose it to untrusted networks.
+
+✅ **Educational Purpose Only**: This laboratory is designed for learning and development. Always follow security best practices in production environments.
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contributions are welcome! If you'd like to:
+- Add new vulnerabilities to the lab
+- Improve documentation
+- Suggest additional mitigation strategies
 
-## Code of Conduct
+Please feel free to open issues or pull requests.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+ 
+## Support
 
-## Security Vulnerabilities
+For questions or issues:
+1. Check the existing documentation
+2. Review the inline code comments in `routes/web.php`
+3. Refer to the OWASP and CWE references provided
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Changelog
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Version 1.0
+- Initial release
+- Path Traversal vulnerability lab with 3 mitigation strategies
+- Open Redirect vulnerability lab with 2 mitigation strategies
+- Interactive web interface for testing
+- Comprehensive documentation
+ 
