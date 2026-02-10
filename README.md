@@ -117,29 +117,14 @@ Demonstrates unsafe redirects and proper validation methods.
    cd DVLA
    ```
 
-2. **Run the setup script**
+2. **Run **
+ 
    ```bash
-   composer run setup
-   ```
-   
-   This will:
-   - Install PHP dependencies
-   - Create `.env` file
-   - Generate application key
-   - Run database migrations
-   - Install npm dependencies
-   - Build assets
-
-3. **Start the development server**
-   ```bash
-   composer run dev
+   composer install
+   php artisan serve --port=8080
    ```
 
-   This starts:
-   - Laravel development server (http://localhost:8000)
-   - Queue listener
-   - Vite asset watcher
-   - Log streaming
+ 
 
 ## Usage
 
